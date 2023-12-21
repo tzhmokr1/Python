@@ -1,0 +1,27 @@
+((lp0
+I4
+aS'abc'
+p1
+aI8
+aS'xyz'
+p2
+tp3
+.(i__main__
+Fahrzeug
+p0
+(dp1
+S'geschwindigkeit'
+p2
+I40
+sS'bezeichnung'
+p3
+S'Opel Admiral'
+p4
+sb.I3
+.S'Berlin'
+p0
+.S'Hamburg'
+p0
+.S'Dortmund'
+p0
+.

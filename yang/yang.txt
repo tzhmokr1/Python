@@ -1,0 +1,268 @@
+
+module acme-module  {
+    namespace "http://acme.example.com/module"; URI
+    prefix acme;
+
+    import "ietf-yang-types"  {
+        prefix yang;
+    }
+    include "acme-system";
+
+    organization "ACME Inc.";
+    contact joe@acme.example.com;
+    description "Module describing the ACME products";
+    revision 2007-06-09  {
+        description "Initial revision.";
+    }
+
+
+
+
+YANG Leaf Statement:
+--------------------
+    One value
+    No children
+    One instance
+
+leaf host-name {
+    type string;
+    mandatory true;
+    config true;
+    description "Hostname for this system";
+}
+leaf cpu-temp {
+    type int32;
+    units degrees-celsius;
+    config false;
+    description "Current temperature in CPU";
+}
+
+NETCONF XML:
+<host-name>my.example.com</host-name>
+
+
+
+
+
+YANG Leaf-list Statement:
+-------------------------
+    One value
+    No children
+    Multiple instances
+
+leaf-list domain-search {
+    type string;
+    ordered-by user;
+    description “List of domain names to search";
+}
+
+NETCONF XML:
+<domain-search>high.example.com</domain-search>
+<domain-search>low.example.com</domain-search>
+
+
+### There are two constructs in YANG for specifying non-leaf nodes: container and list statements:
+
+CONTAINER:
+----------
+container system { 
+     container services {
+         container ssh {
+             presence "Enables SSH";
+             description "SSH service configuration";
+             // more leafs, container, other things
+          }
+     } 
+}
+NETCONF XML: 
+<system>
+      <services>
+          <ssh>
+          </ssh>
+     </services>
+</system>
+
+
+
+
+YANG List Statements:
+---------------------
+list user {
+   key "login-name";
+   leaf login-name {
+       type string;
+   }
+   leaf full-name {
+       type string;
+   }
+}
+
+NETCONF XML:
+<user>
+    <login-name>crobbins</login-name>
+    <full-name>Chuck Robbins</fullname>
+</user>
+<user>
+    <login-name>jchambers</login-name>
+    <full-name>John Chambers</fullname>
+</user>
+
+
+
+
+Define a new type:
+------------------
+
+typedef percent {
+    type uint16 {
+        range "0 .. 100";
+    }
+    description "Percentage";
+}
+
+leaf completed {
+    type percent;
+
+typedef ip-address {
+   type union {
+     type ipv4-address;
+     type ipv6-address;
+   }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+choice route-distinguisher {
+    case ip-address-based {
+        leaf ip-address {
+            type ipv4-address;
+        }
+        leaf ip-address-number {
+            type uint16;
+        }
+    }
+
+### output continued on the next slide ###
+
+### output continuation from the previous slide ###
+
+    case asn32-based {
+        leaf asn32 {
+            type uint32;
+        }
+        leaf two-byte-number {
+            type uint16;
+        }
+    }
+}
+
+
+
+
+
+YANG Grouping Statement:
+------------------------
+grouping endpoint {
+    leaf address {
+       type ip-address;
+    }
+    leaf port {
+       type port-number;
+    }
+}
+
+### output continues on the next slide ###
+
+### output continuation from the previous slide ###
+
+container connection {
+   container source {
+      uses endpoint {
+         refine port {
+            default 80;
+         }
+      }
+   }
+   container destination {
+      uses endpoint {
+         refine port {
+            default 80;
+         }    
+      }
+   }
+}
+
+<connection>
+  <source>
+    <address>192.168.0.3</address>
+    <port>8080</port>
+  </source>
+  <destination>
+    <address>192.168.0.4</address>
+    <port>8080</port>
+  </destination>
+</connection>
+
+
+YANG Miscellaneous Statements 
+-----------------------------
+    Leafref
+
+        Make an element reference in one of the rows in a list, set the element type to leafref.
+
+    Unique
+
+        Fields can be declared unique (example to the right).
+
+    Must
+
+        Restricts valid values by XPath expression.
+
+    When
+
+        Used to check for particular conditions.
+
+
+
+YANG RPC Statement
+------------------
+Administrative actions with input and output parameters
+
+rpc activate-software-image {
+    input {
+        leaf image {
+            type binary;
+        }
+    }
+    output {
+        leaf status {
+            type string;
+        }
+    }
+}
+
+
+
+YANG Imports and Includes
+-------------------------
+Imports = References
+Includes = pulls objects directly into your current namespace. You may want to factor
+ things in separate files, but you want them to end up in the same namespace. 
+ In this case, once a module is included, it cannot be included any other module.
+
+
+
+
+
+

@@ -1,0 +1,59 @@
+device = manager.connect(host=host, port=port, username=user, password=pwd,
+                          hostkey_verify=False, device_params={'name': 'nexus'},
+                          allow_agent=False, look_for_keys=False)
+ get_filter = """
+               <show>
+               <hostname>
+               </hostname>
+               </show>
+               """
+ nc_get_reply = device.get(('subtree', get_filter))
+ print nc_get_reply.xml 
+ ns_map = {'mod': 'http://www.cisco.com/nxos:1.0:vdc_mgr'}	#ns_map object für name space alias
+ xml_rsp = nc_get_reply.data_ele.find('.//mod:hostname', ns_map)  #ele=etree to find object
+ value = xml_rsp.text
+ print value
+
+Filters can be XML strings or XML objects
+-----------------------------------------
+
+from lxml import etree 
+from lxml.builder import ElementMaker
+
+E = ElementMaker()
+nc_filter = E.show(
+    E.hostname()
+)
+print etree.tostring(nc_filter)  # view XML obj as string   
+
+nc_get_reply = device.get(('subtree', nc_filter))
+
+
+
+
+def remove_namespaces(xml):
+        for elem in xml.getiterator():
+            split_tag = elem.tag.split('}')
+            if len(split_tag) > 1:
+                elem.tag = split_tag[1]
+        return xml
+
+ with manager.connect(host=host, port=port, username=user, password=pwd,
+                      hostkey_verify=False, device_params={'name': 'nexus'},
+                      allow_agent=False, look_for_keys=False) as device:
+
+        get_filter = """
+                      <show>
+                        <version>
+                        </version>
+                      </show>
+                      """
+       nc_get_reply = device.get(('subtree', get_filter))
+       nc_get_reply_no_ns = remove_namespaces(nc_get_reply.data_ele)
+       xml_rsp = nc_get_reply_no_ns.find('.//kickstart_ver_str')
+       value = xml_rsp.text
+       print value
+
+
+
+
